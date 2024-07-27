@@ -6,7 +6,6 @@ namespace TaskManagementApi.Models;
 
 public class Task
 {
-    [Key]
     public Guid Id { get; set; }
     
     public string Title { get; set; } = string.Empty;
@@ -18,11 +17,11 @@ public class Task
     public DateTime DueDate { get; set; }
     
     public bool IsFlagged { get; set; }
-    
-    public Project? Project { get; set; }
-    
-    public User? AssignedUser { get; set; }
-    public User? ReporterUser { get; set; }
-    
+    //
+    // public Project? Project { get; set; }
+    //
+    // public User? AssignedUser { get; set; }
+    // public User? ReporterUser { get; set; }
+    //
     // TODO: Add Comments & Attachments
 }
