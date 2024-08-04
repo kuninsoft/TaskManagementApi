@@ -1,3 +1,6 @@
+using TaskManagementApi.Data;
+using TaskManagementApi.Services.UserHandling;
+
 namespace TaskManagementApi;
 
 public class Program
@@ -12,6 +15,9 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddSingleton<AppDbContext>();
+        builder.Services.AddScoped<IUserService, UserService>();
 
         var app = builder.Build();
 

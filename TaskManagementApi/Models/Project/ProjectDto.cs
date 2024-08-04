@@ -3,7 +3,7 @@ using TaskManagementApi.Models.Enums;
 
 namespace TaskManagementApi.Models;
 
-public class Project
+public class ProjectDto
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     

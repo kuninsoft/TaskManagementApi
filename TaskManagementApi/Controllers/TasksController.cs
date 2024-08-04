@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Models;
-using Task = TaskManagementApi.Models.Task;
 
 namespace TaskManagementApi.Controllers;
 
@@ -9,25 +8,25 @@ namespace TaskManagementApi.Controllers;
 public class TasksController : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<Task>> Get()
+    public ActionResult<IEnumerable<TaskDto>> Get()
     {
-        return Ok(new [] { new Task(), new Task() });
+        return Ok(new [] { new TaskDto(), new TaskDto() });
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Task> Get(int id)
+    public ActionResult<TaskDto> Get(int id)
     {
-        return Ok(new Task());
+        return Ok(new TaskDto());
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] Task value)
+    public IActionResult Post([FromBody] TaskDto value)
     {
         return Created("none", value);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Task value)
+    public IActionResult Put(int id, [FromBody] TaskDto value)
     {
         return Ok();
     }

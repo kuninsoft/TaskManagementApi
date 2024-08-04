@@ -9,25 +9,25 @@ namespace TaskManagementApi.Controllers;
 public class ProjectsController : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<Project>> Get()
+    public ActionResult<IEnumerable<ProjectDto>> Get()
     {
-        return Ok(new [] { new Project(), new Project() });
+        return Ok(new [] { new ProjectDto(), new ProjectDto() });
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Project> Get(int id)
+    public ActionResult<ProjectDto> Get(int id)
     {
-        return Ok(new Project());
+        return Ok(new ProjectDto());
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] Project value)
+    public IActionResult Post([FromBody] ProjectDto value)
     {
         return Created("none", value);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Project value)
+    public IActionResult Put(int id, [FromBody] ProjectDto value)
     {
         return Ok();
     }

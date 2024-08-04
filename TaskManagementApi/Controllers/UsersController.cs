@@ -1,40 +1,87 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Models;
+using TaskManagementApi.Services.UserHandling;
 
 namespace TaskManagementApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController : ControllerBase
+public class UsersController(IUserService userService) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<User>> Get()
+    public async Task<IActionResult> Get()
     {
-        return Ok(new [] { new User(), new User() });
+        List<UserDto> users = await userService.GetAllUsers();
+
+        if (users.Count == 0)
+        {
+            return NoContent();
+        }
+        
+        return Ok(users);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<User> Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok(new User());
+        try
+        {
+            UserDto user = await userService.GetUser(id);
+
+            return Ok(user);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] User value)
+    public async Task<IActionResult> Post([FromBody] CreateUserDto value)
     {
-        return Created("none", value);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        
+        UserDto createdUser = await userService.CreateUser(value);
+
+        return Created(Url.Action(nameof(Get), new { id = createdUser.Id  }), createdUser);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] User value)
+    public async Task<IActionResult> Put(int id, [FromBody] UpdateUserDto value)
     {
-        return Ok();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await userService.UpdateUser(id, value);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
+        try
+        {
+            await userService.DeleteUser(id);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        
         return Ok();
     }
 }
