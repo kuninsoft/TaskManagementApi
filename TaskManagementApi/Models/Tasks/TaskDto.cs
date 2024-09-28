@@ -1,15 +1,15 @@
-using System.ComponentModel.DataAnnotations;
 using TaskManagementApi.Models.Enums;
+using TaskManagementApi.Models.Project;
 using TaskStatus = TaskManagementApi.Models.Enums.TaskStatus;
 
-namespace TaskManagementApi.Models;
+namespace TaskManagementApi.Models.Tasks;
 
 public class TaskDto
 {
     public int Id { get; set; }
     
-    public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string Title { get; set; } = null!;
+    public string Description { get; set; } = null!;
     
     public TaskStatus Status { get; set; }
     public TaskPriority Priority { get; set; }
@@ -17,9 +17,8 @@ public class TaskDto
     public DateTime DueDate { get; set; }
     
     public bool IsFlagged { get; set; }
-    
-    public ProjectSummaryDto Project { get; set; }
 
+    public ProjectSummaryDto Project { get; set; } = null!;
     public UserSummaryDto AssignedUser { get; set; } = null!;
     public UserSummaryDto ReporterUser { get; set; } = null!;
 }
