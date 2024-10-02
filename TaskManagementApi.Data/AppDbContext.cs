@@ -34,14 +34,17 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Project>()
                     .HasOne(p => p.Owner)
-                    .WithMany(u => u.OwnedProjects);
+                    .WithMany(u => u.OwnedProjects)
+                    .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Task>()
                     .HasOne(t => t.AssignedUser)
-                    .WithMany(u => u.AssignedTasks);
+                    .WithMany(u => u.AssignedTasks)
+                    .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<Entities.Task>()
                     .HasOne(t => t.ReporterUser)
-                    .WithMany(u => u.ReportedTasks);
+                    .WithMany(u => u.ReportedTasks)
+                    .OnDelete(DeleteBehavior.Restrict);
     }
 }
