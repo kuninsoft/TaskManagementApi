@@ -14,15 +14,17 @@ public class UserService(AppDbContext dbContext) : IUserService
 {
     public Task<List<UserDto>> GetAllUsers()
     {
-        return Task.FromResult(dbContext.Users.Select(user => user.ToUserDto()).ToList());
+        List<User> userEntities = QueryUsers().ToList();
+        
+        return Task.FromResult(userEntities.Select(user => user.ToUserDto()).ToList());
     }
     
-    public async Task<UserDto> GetUser(int id)
+    public Task<UserDto> GetUser(int id)
     {
-        User user = await dbContext.Users.FindAsync(id)
+        User user = QueryUsers().ToList().FirstOrDefault(user => user.Id == id)
                     ?? throw new KeyNotFoundException();
 
-        return user.ToUserDto();
+        return Task.FromResult(user.ToUserDto());
     }
 
     public async Task<UserDto> CreateUser(CreateUserDto createUserDto)
@@ -33,11 +35,11 @@ public class UserService(AppDbContext dbContext) : IUserService
             Email = createUserDto.Email,
             FullName = createUserDto.FullName,
             PasswordHash = createUserDto.Password, // TODO: Hash
-            CreatedDate = DateTime.Now,
+            CreatedDate = DateTime.UtcNow,
             Role = Role.User
         };
 
-        await dbContext.Users.AddAsync(userEntity);
+        dbContext.Users.Add(userEntity);
         await dbContext.SaveChangesAsync();
 
         return userEntity.ToUserDto();
@@ -84,5 +86,13 @@ public class UserService(AppDbContext dbContext) : IUserService
         dbContext.Projects.Update(project);
 
         await dbContext.SaveChangesAsync();
+    }
+
+    private IQueryable<User> QueryUsers()
+    {
+        return dbContext.Users
+                        .Include(user => user.AssignedTasks)
+                        .Include(user => user.OwnedProjects)
+                        .Include(user => user.AssignedProjects);
     }
 }
