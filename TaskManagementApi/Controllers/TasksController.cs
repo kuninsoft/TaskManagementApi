@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Models;
+using TaskManagementApi.Models.Tasks;
 
 namespace TaskManagementApi.Controllers;
 
