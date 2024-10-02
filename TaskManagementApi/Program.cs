@@ -1,4 +1,5 @@
 using TaskManagementApi.Data;
+using TaskManagementApi.Services.ProjectHandling;
 using TaskManagementApi.Services.UserHandling;
 
 namespace TaskManagementApi;
@@ -18,8 +19,9 @@ public class Program
 
         builder.Services.AddSingleton<AppDbContext>();
         builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IProjectService, ProjectService>();
 
-        var app = builder.Build();
+        WebApplication app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

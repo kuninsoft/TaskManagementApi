@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TaskManagementApi.Models;
+using TaskManagementApi.Models.Project;
 
 namespace TaskManagementApi.Controllers;
 

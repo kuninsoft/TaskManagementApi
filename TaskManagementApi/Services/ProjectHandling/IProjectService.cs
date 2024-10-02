@@ -1,4 +1,4 @@
-using TaskManagementApi.Models;
+using TaskManagementApi.Models.Project;
 
 namespace TaskManagementApi.Services.ProjectHandling;
 
