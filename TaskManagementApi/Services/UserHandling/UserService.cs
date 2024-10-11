@@ -3,7 +3,6 @@ using TaskManagementApi.Data;
 using TaskManagementApi.Data.Entities;
 using TaskManagementApi.Data.Entities.Enums;
 using TaskManagementApi.Extensions;
-using TaskManagementApi.Models;
 using TaskManagementApi.Models.User;
 using Task = System.Threading.Tasks.Task;
 
@@ -15,14 +14,14 @@ public class UserService(AppDbContext dbContext) : IUserService
     public async Task<List<UserDto>> GetAllUsers()
     {
         List<User> userEntities = await QueryUsers().ToListAsync();
-        
+
         return userEntities.Select(user => user.AsDto()).ToList();
     }
-    
+
     public async Task<UserDto> GetUser(int id)
     {
         User user = (await QueryUsers().ToListAsync()).FirstOrDefault(user => user.Id == id)
-                    ?? throw new KeyNotFoundException();
+                    ?? throw new KeyNotFoundException($"User with ID {id} was not found");
 
         return user.AsDto();
     }
@@ -47,21 +46,20 @@ public class UserService(AppDbContext dbContext) : IUserService
 
     public async Task UpdateUser(int id, UpdateUserDto updateUserDto)
     {
-        User user = await dbContext.Users.FindAsync(id) 
-                    ?? throw new KeyNotFoundException();
+        User user = await dbContext.Users.FindAsync(id)
+                    ?? throw new KeyNotFoundException($"User with ID {id} was not found");
 
-        if (updateUserDto.FullName != null) user.FullName = updateUserDto.FullName;
-        if (updateUserDto.Username != null) user.Username = updateUserDto.Username;
-        if (updateUserDto.Email != null) user.Email = updateUserDto.Email;
+        if (!string.IsNullOrWhiteSpace(updateUserDto.FullName)) user.FullName = updateUserDto.FullName;
+        if (!string.IsNullOrWhiteSpace(updateUserDto.Username)) user.Username = updateUserDto.Username;
+        if (!string.IsNullOrWhiteSpace(updateUserDto.Email)) user.Email = updateUserDto.Email;
 
-        dbContext.Users.Update(user);
         await dbContext.SaveChangesAsync();
     }
 
     public async Task DeleteUser(int id)
     {
-        User user = await dbContext.Users.FindAsync(id) 
-                    ?? throw new KeyNotFoundException();
+        User user = await dbContext.Users.FindAsync(id)
+                    ?? throw new KeyNotFoundException($"User with ID {id} was not found");
 
         dbContext.Users.Remove(user);
         await dbContext.SaveChangesAsync();
@@ -72,12 +70,13 @@ public class UserService(AppDbContext dbContext) : IUserService
         User user = await dbContext.Users
                                    .Include(u => u.AssignedProjects)
                                    .FirstOrDefaultAsync(u => u.Id == assignProjectDto.UserId)
-                    ?? throw new KeyNotFoundException("User was not found");
+                    ?? throw new KeyNotFoundException($"User with ID {assignProjectDto.UserId} was not found");
 
         Project project = await dbContext.Projects
                                          .FirstOrDefaultAsync(p => p.Id == assignProjectDto.ProjectId)
-                          ?? throw new KeyNotFoundException("Project was not found");
-        
+                          ?? throw new KeyNotFoundException(
+                              $"Project with ID {assignProjectDto.ProjectId} was not found");
+
         user.AssignedProjects.Add(project);
 
         await dbContext.SaveChangesAsync();

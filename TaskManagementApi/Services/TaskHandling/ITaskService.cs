@@ -6,7 +6,7 @@ public interface ITaskService
 {
     Task<List<TaskDto>> GetAllTasks();
     Task<TaskDto> GetTask(int id);
-    Task<TaskDto> CreateTask(CreateTaskDto createProjectDto);
-    Task UpdateTask(int id, UpdateTaskDto updateProjectDto);
+    Task<TaskDto> CreateTask(CreateTaskDto createTaskDto);
+    Task UpdateTask(int id, UpdateTaskDto updateTaskDto);
     Task DeleteTask(int id);
 }

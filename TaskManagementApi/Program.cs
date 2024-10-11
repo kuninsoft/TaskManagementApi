@@ -1,5 +1,6 @@
 using TaskManagementApi.Data;
 using TaskManagementApi.Services.ProjectHandling;
+using TaskManagementApi.Services.TaskHandling;
 using TaskManagementApi.Services.UserHandling;
 
 namespace TaskManagementApi;
@@ -20,6 +21,7 @@ public class Program
         builder.Services.AddSingleton<AppDbContext>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();
+        builder.Services.AddScoped<ITaskService, TaskService>();
 
         WebApplication app = builder.Build();
 

@@ -19,7 +19,7 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
     public async Task<ProjectDto> GetProject(int id)
     {
         Project project = (await QueryProjects().ToListAsync()).FirstOrDefault(project => project.Id == id)
-                                ?? throw new KeyNotFoundException();
+                                ?? throw new KeyNotFoundException($"Project with ID {id} was not found");
 
         return project.AsDto();
     }
@@ -35,7 +35,7 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
             DueDate = createProjectDto.DueDate
         };
 
-        await dbContext.Projects.AddAsync(projectEntity);
+        dbContext.Projects.Add(projectEntity);
         await dbContext.SaveChangesAsync();
         
         return projectEntity.AsDto();
@@ -44,21 +44,20 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
     public async Task UpdateProject(int id, UpdateProjectDto updateProjectDto)
     {
         Project project = await dbContext.Projects.FindAsync(id)
-                          ?? throw new KeyNotFoundException();
+                          ?? throw new KeyNotFoundException($"Project with ID {id} was not found");
         
-        if (updateProjectDto.Name is not null) project.Name = updateProjectDto.Name;
+        if (!string.IsNullOrWhiteSpace(updateProjectDto.Name)) project.Name = updateProjectDto.Name;
         if (updateProjectDto.Description is not null) project.Description = updateProjectDto.Description;
         if (updateProjectDto.DueDate.HasValue) project.DueDate = updateProjectDto.DueDate.Value;
         if (updateProjectDto.ProjectStatus.HasValue) project.Status = updateProjectDto.ProjectStatus.Value;
 
-        dbContext.Projects.Update(project);
         await dbContext.SaveChangesAsync();
     }
 
     public async Task DeleteProject(int id)
     {
         Project project = await dbContext.Projects.FindAsync(id)
-                          ?? throw new KeyNotFoundException();
+                          ?? throw new KeyNotFoundException($"Project with ID {id} was not found");
         
         dbContext.Projects.Remove(project);
         await dbContext.SaveChangesAsync();
