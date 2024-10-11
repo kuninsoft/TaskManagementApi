@@ -15,8 +15,4 @@
       <ProjectReference Include="..\TaskManagementApi.Data\TaskManagementApi.Data.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\TaskHandling\" />
-    </ItemGroup>
-
 </Project>

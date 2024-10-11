@@ -1,4 +1,5 @@
 using TaskManagementApi.Models;
+using TaskManagementApi.Models.User;
 
 namespace TaskManagementApi.Services.UserHandling;
 

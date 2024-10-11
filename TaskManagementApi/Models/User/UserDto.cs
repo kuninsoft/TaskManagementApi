@@ -1,8 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using TaskManagementApi.Models.Project;
 using TaskManagementApi.Models.Tasks;
 
-namespace TaskManagementApi.Models;
+namespace TaskManagementApi.Models.User;
 
 public class UserDto
 {

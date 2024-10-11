@@ -8,7 +8,7 @@ namespace TaskManagementApi.Extensions;
 
 public static class ProjectEntityExtensions
 {
-    public static ProjectDto ToProjectDto(this Project project)
+    public static ProjectDto AsDto(this Project project)
     {
         return new ProjectDto
         {
@@ -18,24 +18,13 @@ public static class ProjectEntityExtensions
             CreatedDate = project.CreatedDate,
             DueDate = project.DueDate,
             Status = ConvertProjectStatus(project.Status),
-            Owner = project.Owner.ToUserSummaryDto(),
-            ProjectTeam = project.AssignedUsers.Select(user => user.ToUserSummaryDto()).ToList()
+            Owner = project.Owner.AsSummaryDto(),
+            ProjectTeam = project.AssignedUsers.Select(user => user.AsSummaryDto()).ToList(),
+            Tasks = project.Tasks.Select(task => task.AsSummaryDto()).ToList()
         };
     }
-
-    private static ProjectStatus ConvertProjectStatus(TaskManagementApi.Data.Entities.Enums.ProjectStatus status)
-    {
-        return status switch
-        {
-            EntityEnums.ProjectStatus.Active => ProjectStatus.Active,
-            EntityEnums.ProjectStatus.Completed => ProjectStatus.Completed,
-            EntityEnums.ProjectStatus.OnHold => ProjectStatus.OnHold,
-            EntityEnums.ProjectStatus.Canceled => ProjectStatus.Canceled,
-            _ => throw new ArgumentOutOfRangeException(nameof(status), "Invalid status passed")
-        };
-    }
-
-    public static ProjectSummaryDto ToProjectSummaryDto(this Project project)
+    
+    public static ProjectSummaryDto AsSummaryDto(this Project project)
     {
         return new ProjectSummaryDto
         {
@@ -45,6 +34,18 @@ public static class ProjectEntityExtensions
             CreatedDate = project.CreatedDate,
             DueDate = project.DueDate,
             Status = ConvertProjectStatus(project.Status)
+        };
+    }
+
+    private static ProjectStatus ConvertProjectStatus(EntityEnums.ProjectStatus status)
+    {
+        return status switch
+        {
+            EntityEnums.ProjectStatus.Active => ProjectStatus.Active,
+            EntityEnums.ProjectStatus.Completed => ProjectStatus.Completed,
+            EntityEnums.ProjectStatus.OnHold => ProjectStatus.OnHold,
+            EntityEnums.ProjectStatus.Canceled => ProjectStatus.Canceled,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Invalid status passed")
         };
     }
 }

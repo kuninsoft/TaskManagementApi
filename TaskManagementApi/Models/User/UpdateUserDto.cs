@@ -1,4 +1,4 @@
-namespace TaskManagementApi.Models;
+namespace TaskManagementApi.Models.User;
 
 public class UpdateUserDto
 {

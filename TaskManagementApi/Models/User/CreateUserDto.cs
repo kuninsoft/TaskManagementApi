@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagementApi.Models;
+namespace TaskManagementApi.Models.User;
 
 public class CreateUserDto
 {

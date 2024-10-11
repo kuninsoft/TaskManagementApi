@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Models;
+using TaskManagementApi.Models.User;
 using TaskManagementApi.Services.UserHandling;
 
 namespace TaskManagementApi.Controllers;
@@ -82,6 +83,26 @@ public class UsersController(IUserService userService) : ControllerBase
             return NotFound();
         }
         
+        return Ok();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> AssignProject([FromBody] AssignProjectDto value)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await userService.AssignProject(value);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+
         return Ok();
     }
 }

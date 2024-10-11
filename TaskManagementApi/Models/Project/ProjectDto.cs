@@ -1,4 +1,6 @@
 using TaskManagementApi.Models.Enums;
+using TaskManagementApi.Models.Tasks;
+using TaskManagementApi.Models.User;
 
 namespace TaskManagementApi.Models.Project;
 
@@ -16,4 +18,5 @@ public class ProjectDto
 
     public UserSummaryDto Owner { get; set; } = null!;
     public List<UserSummaryDto> ProjectTeam { get; set; } = [];
+    public List<TaskSummaryDto> Tasks { get; set; } = [];
 }

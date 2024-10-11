@@ -1,11 +1,12 @@
 using TaskManagementApi.Data.Entities;
 using TaskManagementApi.Models;
+using TaskManagementApi.Models.User;
 
 namespace TaskManagementApi.Extensions;
 
 public static class UserEntityExtensions
 {
-    public static UserDto ToUserDto(this User entity)
+    public static UserDto AsDto(this User entity)
     {
         return new UserDto
         {
@@ -14,13 +15,13 @@ public static class UserEntityExtensions
             Email = entity.Email,
             FullName = entity.FullName,
             CreatedDate = entity.CreatedDate,
-            OwnedProjects = entity.OwnedProjects.Select(project => project.ToProjectSummaryDto()).ToList(),
-            AssignedProjects = entity.AssignedProjects.Select(project => project.ToProjectSummaryDto()).ToList(),
-            // AssignedTasks = entity.AssignedTasks.Select(task => task.ToTaskSummaryDto()).ToList()
+            OwnedProjects = entity.OwnedProjects.Select(project => project.AsSummaryDto()).ToList(),
+            AssignedProjects = entity.AssignedProjects.Select(project => project.AsSummaryDto()).ToList(),
+            AssignedTasks = entity.AssignedTasks.Select(task => task.AsSummaryDto()).ToList()
         };
     }
 
-    public static UserSummaryDto ToUserSummaryDto(this User entity)
+    public static UserSummaryDto AsSummaryDto(this User entity)
     {
         return new UserSummaryDto
         {

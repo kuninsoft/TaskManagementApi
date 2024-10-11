@@ -13,7 +13,7 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
     {
         List<Project> projectEntities = await QueryProjects().ToListAsync();
 
-        return projectEntities.Select(project => project.ToProjectDto()).ToList();
+        return projectEntities.Select(project => project.AsDto()).ToList();
     }
 
     public async Task<ProjectDto> GetProject(int id)
@@ -21,7 +21,7 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
         Project project = (await QueryProjects().ToListAsync()).FirstOrDefault(project => project.Id == id)
                                 ?? throw new KeyNotFoundException();
 
-        return project.ToProjectDto();
+        return project.AsDto();
     }
 
     public async Task<ProjectDto> CreateProject(CreateProjectDto createProjectDto)
@@ -38,7 +38,7 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
         await dbContext.Projects.AddAsync(projectEntity);
         await dbContext.SaveChangesAsync();
         
-        return projectEntity.ToProjectDto();
+        return projectEntity.AsDto();
     }
 
     public async Task UpdateProject(int id, UpdateProjectDto updateProjectDto)

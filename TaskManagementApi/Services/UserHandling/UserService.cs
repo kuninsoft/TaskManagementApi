@@ -4,7 +4,7 @@ using TaskManagementApi.Data.Entities;
 using TaskManagementApi.Data.Entities.Enums;
 using TaskManagementApi.Extensions;
 using TaskManagementApi.Models;
-
+using TaskManagementApi.Models.User;
 using Task = System.Threading.Tasks.Task;
 
 namespace TaskManagementApi.Services.UserHandling;
@@ -12,19 +12,19 @@ namespace TaskManagementApi.Services.UserHandling;
 // TODO Make repository/unit of work
 public class UserService(AppDbContext dbContext) : IUserService
 {
-    public Task<List<UserDto>> GetAllUsers()
+    public async Task<List<UserDto>> GetAllUsers()
     {
-        List<User> userEntities = QueryUsers().ToList();
+        List<User> userEntities = await QueryUsers().ToListAsync();
         
-        return Task.FromResult(userEntities.Select(user => user.ToUserDto()).ToList());
+        return userEntities.Select(user => user.AsDto()).ToList();
     }
     
-    public Task<UserDto> GetUser(int id)
+    public async Task<UserDto> GetUser(int id)
     {
-        User user = QueryUsers().ToList().FirstOrDefault(user => user.Id == id)
+        User user = (await QueryUsers().ToListAsync()).FirstOrDefault(user => user.Id == id)
                     ?? throw new KeyNotFoundException();
 
-        return Task.FromResult(user.ToUserDto());
+        return user.AsDto();
     }
 
     public async Task<UserDto> CreateUser(CreateUserDto createUserDto)
@@ -42,7 +42,7 @@ public class UserService(AppDbContext dbContext) : IUserService
         dbContext.Users.Add(userEntity);
         await dbContext.SaveChangesAsync();
 
-        return userEntity.ToUserDto();
+        return userEntity.AsDto();
     }
 
     public async Task UpdateUser(int id, UpdateUserDto updateUserDto)
@@ -75,15 +75,10 @@ public class UserService(AppDbContext dbContext) : IUserService
                     ?? throw new KeyNotFoundException("User was not found");
 
         Project project = await dbContext.Projects
-                                         .Include(p => p.AssignedUsers)
                                          .FirstOrDefaultAsync(p => p.Id == assignProjectDto.ProjectId)
                           ?? throw new KeyNotFoundException("Project was not found");
         
         user.AssignedProjects.Add(project);
-        project.AssignedUsers.Add(user);
-
-        dbContext.Users.Update(user);
-        dbContext.Projects.Update(project);
 
         await dbContext.SaveChangesAsync();
     }

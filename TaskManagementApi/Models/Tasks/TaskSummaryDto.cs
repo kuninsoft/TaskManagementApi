@@ -13,7 +13,8 @@ public class TaskSummaryDto
     public TaskStatus Status { get; set; }
     public TaskPriority Priority { get; set; }
     
-    public DateTime DueDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime? DueDate { get; set; }
     
     public bool IsFlagged { get; set; }
 }
