@@ -47,7 +47,7 @@ public class UsersController(IUserService userService) : ControllerBase
         
         UserDto createdUser = await userService.CreateUser(value);
 
-        return Created(Url.Action(nameof(Get), new { id = createdUser.Id  }), createdUser);
+        return Created(Url.Action(nameof(Get), new { id = createdUser.Id }), createdUser);
     }
 
     [HttpPut("{id}")]
