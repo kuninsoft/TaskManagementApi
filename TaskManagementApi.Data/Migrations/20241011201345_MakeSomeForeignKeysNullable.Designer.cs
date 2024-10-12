@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManagementApi.Data;
 
@@ -10,9 +11,11 @@ using TaskManagementApi.Data;
 namespace TaskManagementApi.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241011201345_MakeSomeForeignKeysNullable")]
+    partial class MakeSomeForeignKeysNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
@@ -173,7 +176,7 @@ namespace TaskManagementApi.Data.Migrations
                     b.HasOne("TaskManagementApi.Data.Entities.User", "Owner")
                         .WithMany("OwnedProjects")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Owner");
                 });
@@ -183,7 +186,7 @@ namespace TaskManagementApi.Data.Migrations
                     b.HasOne("TaskManagementApi.Data.Entities.User", "AssignedUser")
                         .WithMany("AssignedTasks")
                         .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TaskManagementApi.Data.Entities.Project", "Project")
                         .WithMany("Tasks")
@@ -194,7 +197,7 @@ namespace TaskManagementApi.Data.Migrations
                     b.HasOne("TaskManagementApi.Data.Entities.User", "ReporterUser")
                         .WithMany("ReportedTasks")
                         .HasForeignKey("ReporterUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AssignedUser");
 

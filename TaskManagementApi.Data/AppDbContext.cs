@@ -26,25 +26,41 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-
         modelBuilder.Entity<User>()
                     .HasMany(u => u.AssignedProjects)
                     .WithMany(p => p.AssignedUsers);
+        
+        modelBuilder.Entity<User>()
+                    .HasIndex(u => u.Email)
+                    .IsUnique();
 
         modelBuilder.Entity<Project>()
                     .HasOne(p => p.Owner)
                     .WithMany(u => u.OwnedProjects)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey(p => p.OwnerId)
+                    .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<Project>()
+                    .HasIndex(p => p.Name)
+                    .IsUnique();
 
         modelBuilder.Entity<Entities.Task>()
                     .HasOne(t => t.AssignedUser)
                     .WithMany(u => u.AssignedTasks)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey(t => t.AssignedUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
         
         modelBuilder.Entity<Entities.Task>()
                     .HasOne(t => t.ReporterUser)
                     .WithMany(u => u.ReportedTasks)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey(t => t.ReporterUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Project>()
+                    .HasMany(p => p.Tasks)
+                    .WithOne(t => t.Project)
+                    .OnDelete(DeleteBehavior.Cascade);
+        
+        base.OnModelCreating(modelBuilder);
     }
 }

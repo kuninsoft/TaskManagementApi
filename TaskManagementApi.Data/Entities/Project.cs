@@ -16,8 +16,8 @@ public class Project
     
     public ProjectStatus Status { get; set; }
     
-    public int OwnerId { get; set; }
-    public User Owner { get; set; } = null!;
+    public int? OwnerId { get; set; }
+    public User? Owner { get; set; }
 
     public List<User> AssignedUsers { get; set; } = [];
     public List<Task> Tasks { get; set; } = [];

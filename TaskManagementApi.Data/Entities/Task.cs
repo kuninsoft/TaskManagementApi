@@ -21,8 +21,8 @@ public class Task
     public int ProjectId { get; set; }
     public Project Project { get; set; } = null!;
     
-    public int ReporterUserId { get; set; } 
-    public User ReporterUser { get; set; } = null!;
+    public int? ReporterUserId { get; set; } 
+    public User? ReporterUser { get; set; }
     
     public int? AssignedUserId { get; set; }
     public User? AssignedUser { get; set; }
