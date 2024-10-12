@@ -18,7 +18,7 @@ public static class ProjectEntityExtensions
             CreatedDate = project.CreatedDate,
             DueDate = project.DueDate,
             Status = ConvertProjectStatus(project.Status),
-            Owner = project.Owner.AsSummaryDto(),
+            Owner = project.Owner?.AsSummaryDto(),
             ProjectTeam = project.AssignedUsers.Select(user => user.AsSummaryDto()).ToList(),
             Tasks = project.Tasks.Select(task => task.AsSummaryDto()).ToList()
         };

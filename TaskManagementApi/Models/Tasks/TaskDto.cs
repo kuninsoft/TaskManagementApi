@@ -22,6 +22,6 @@ public class TaskDto
 
     public ProjectSummaryDto Project { get; set; } = null!;
     
-    public UserSummaryDto ReporterUser { get; set; } = null!;
+    public UserSummaryDto? ReporterUser { get; set; }
     public UserSummaryDto? AssignedUser { get; set; }
 }

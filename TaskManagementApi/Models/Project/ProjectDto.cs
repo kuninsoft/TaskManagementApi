@@ -16,7 +16,7 @@ public class ProjectDto
     
     public ProjectStatus Status { get; set; }
 
-    public UserSummaryDto Owner { get; set; } = null!;
+    public UserSummaryDto? Owner { get; set; }
     public List<UserSummaryDto> ProjectTeam { get; set; } = [];
     public List<TaskSummaryDto> Tasks { get; set; } = [];
 }

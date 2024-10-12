@@ -21,7 +21,7 @@ public static class TaskEntityExtensions
             DueDate = task.DueDate,
             IsFlagged = task.IsFlagged,
             Project = task.Project.AsSummaryDto(),
-            ReporterUser = task.ReporterUser.AsSummaryDto(),
+            ReporterUser = task.ReporterUser?.AsSummaryDto(),
             AssignedUser = task.AssignedUser?.AsSummaryDto()
         };
     }

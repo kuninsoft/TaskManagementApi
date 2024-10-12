@@ -1,40 +1,86 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagementApi.Models;
 using TaskManagementApi.Models.Tasks;
+using TaskManagementApi.Services.TaskHandling;
 
 namespace TaskManagementApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TasksController : ControllerBase
+public class TasksController(ITaskService taskService) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<TaskDto>> Get()
+    public async Task<IActionResult> Get()
     {
-        return Ok(new [] { new TaskDto(), new TaskDto() });
+        List<TaskDto> tasks = await taskService.GetAllTasks();
+
+        if (tasks.Count == 0)
+        {
+            return NoContent();
+        }
+        
+        return Ok(tasks);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<TaskDto> Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok(new TaskDto());
+        try
+        {
+            TaskDto task = await taskService.GetTask(id);
+
+            return Ok(task);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] TaskDto value)
+    public async Task<IActionResult> Post([FromBody] CreateTaskDto value)
     {
-        return Created("none", value);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        TaskDto createdTask = await taskService.CreateTask(value);
+
+        return Created(Url.Action(nameof(Get), new { id = createdTask.Id }), createdTask);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] TaskDto value)
+    public async Task<IActionResult> Put(int id, [FromBody] UpdateTaskDto value)
     {
-        return Ok();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        
+        try
+        {
+            await taskService.UpdateTask(id, value);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
+        try
+        {
+            await taskService.DeleteTask(id);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+
         return Ok();
     }
 }
