@@ -40,6 +40,14 @@ public class TaskService(AppDbContext dbContext) : ITaskService
         dbContext.Tasks.Add(taskEntity);
         await dbContext.SaveChangesAsync();
 
+        await dbContext.Entry(taskEntity)
+                       .Reference(task => task.Project)
+                       .LoadAsync();
+        
+        await dbContext.Entry(taskEntity)
+                       .Reference(task => task.ReporterUser)
+                       .LoadAsync();
+        
         return taskEntity.AsDto();
     }
 

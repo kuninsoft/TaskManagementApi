@@ -37,6 +37,10 @@ public class ProjectService(AppDbContext dbContext) : IProjectService
 
         dbContext.Projects.Add(projectEntity);
         await dbContext.SaveChangesAsync();
+
+        await dbContext.Entry(projectEntity)
+                       .Reference(project => project.Owner)
+                       .LoadAsync();
         
         return projectEntity.AsDto();
     }
