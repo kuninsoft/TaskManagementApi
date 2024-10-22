@@ -5,8 +5,6 @@ namespace TaskManagementApi.Data;
 
 public class AppDbContext : DbContext
 {
-    private const string UserProjectTableName = "UserProject";
-    
     public DbSet<User> Users { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Entities.Task> Tasks { get; set; }
