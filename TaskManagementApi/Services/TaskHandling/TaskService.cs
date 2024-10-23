@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using TaskManagementApi.Data;
+using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Extensions;
 using TaskManagementApi.Models.Tasks;
 
@@ -7,18 +6,18 @@ using TaskEntity = TaskManagementApi.Data.Entities.Task;
 
 namespace TaskManagementApi.Services.TaskHandling;
 
-public class TaskService(AppDbContext dbContext) : ITaskService
+public class TaskService(TaskRepository repository) : ITaskService
 {
     public async Task<List<TaskDto>> GetAllTasks()
     {
-        List<TaskEntity> tasks = await QueryTasks().ToListAsync();
+        List<TaskEntity> tasks = await repository.GetAllAsync();
 
         return tasks.Select(task => task.AsDto()).ToList();
     }
 
     public async Task<TaskDto> GetTask(int id)
     {
-        TaskEntity task = (await QueryTasks().ToListAsync()).FirstOrDefault(task => task.Id == id) ??
+        TaskEntity task = await repository.GetByIdAsync(id) ??
                           throw new KeyNotFoundException($"Task with ID {id} was not found");
 
         return task.AsDto();
@@ -37,23 +36,14 @@ public class TaskService(AppDbContext dbContext) : ITaskService
             CreatedDate = DateTime.UtcNow
         };
         
-        dbContext.Tasks.Add(taskEntity);
-        await dbContext.SaveChangesAsync();
-
-        await dbContext.Entry(taskEntity)
-                       .Reference(task => task.Project)
-                       .LoadAsync();
-        
-        await dbContext.Entry(taskEntity)
-                       .Reference(task => task.ReporterUser)
-                       .LoadAsync();
+        await repository.CreateAsync(taskEntity);
         
         return taskEntity.AsDto();
     }
 
     public async Task UpdateTask(int id, UpdateTaskDto updateTaskDto)
     {
-        TaskEntity task = await dbContext.Tasks.FindAsync(id) 
+        TaskEntity task = await repository.GetByIdAsync(id)
                           ?? throw new KeyNotFoundException($"Task with ID {id} was not found");
         
         if (!string.IsNullOrWhiteSpace(updateTaskDto.Title)) task.Title = updateTaskDto.Title;
@@ -64,23 +54,14 @@ public class TaskService(AppDbContext dbContext) : ITaskService
         if (updateTaskDto.ReporterUserId.HasValue) task.ReporterUserId = updateTaskDto.ReporterUserId.Value;
         if (updateTaskDto.AssignedUserId.HasValue) task.AssignedUserId = updateTaskDto.AssignedUserId.Value;
 
-        await dbContext.SaveChangesAsync();
+        await repository.UpdateAsync(task);
     }
 
     public async Task DeleteTask(int id)
     {
-        TaskEntity task = await dbContext.Tasks.FindAsync(id)
+        TaskEntity task = await repository.GetByIdAsync(id)
                           ?? throw new KeyNotFoundException($"Task with ID {id} was not found");
         
-        dbContext.Tasks.Remove(task);
-        await dbContext.SaveChangesAsync();
-    }
-
-    private IQueryable<TaskEntity> QueryTasks()
-    {
-        return dbContext.Tasks
-                        .Include(task => task.Project)
-                        .Include(task => task.ReporterUser)
-                        .Include(task => task.AssignedUser);
+        await repository.DeleteAsync(task);
     }
 }

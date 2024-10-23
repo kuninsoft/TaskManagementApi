@@ -1,4 +1,5 @@
 using TaskManagementApi.Data;
+using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Services.ProjectHandling;
 using TaskManagementApi.Services.TaskHandling;
 using TaskManagementApi.Services.UserHandling;
@@ -9,7 +10,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
 
@@ -18,7 +19,12 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
 
-        builder.Services.AddSingleton<AppDbContext>();
+        builder.Services.AddScoped<AppDbContext>();
+
+        builder.Services.AddScoped<UserRepository>();
+        builder.Services.AddScoped<ProjectRepository>();
+        builder.Services.AddScoped<TaskRepository>();
+        
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();
         builder.Services.AddScoped<ITaskService, TaskService>();
@@ -35,7 +41,6 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
-
 
         app.MapControllers();
 

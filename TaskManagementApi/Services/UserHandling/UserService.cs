@@ -1,26 +1,24 @@
-using Microsoft.EntityFrameworkCore;
-using TaskManagementApi.Data;
 using TaskManagementApi.Data.Entities;
 using TaskManagementApi.Data.Entities.Enums;
+using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Extensions;
 using TaskManagementApi.Models.User;
 using Task = System.Threading.Tasks.Task;
 
 namespace TaskManagementApi.Services.UserHandling;
 
-// TODO Make repository/unit of work
-public class UserService(AppDbContext dbContext) : IUserService
+public class UserService(UserRepository repository, ProjectRepository projectRepository) : IUserService
 {
     public async Task<List<UserDto>> GetAllUsers()
     {
-        List<User> userEntities = await QueryUsers().ToListAsync();
+        List<User> userEntities = await repository.GetAllAsync();
 
         return userEntities.Select(user => user.AsDto()).ToList();
     }
 
     public async Task<UserDto> GetUser(int id)
     {
-        User user = (await QueryUsers().ToListAsync()).FirstOrDefault(user => user.Id == id)
+        User user = await repository.GetByIdAsync(id)
                     ?? throw new KeyNotFoundException($"User with ID {id} was not found");
 
         return user.AsDto();
@@ -38,55 +36,42 @@ public class UserService(AppDbContext dbContext) : IUserService
             Role = Role.User
         };
 
-        dbContext.Users.Add(userEntity);
-        await dbContext.SaveChangesAsync();
+        await repository.CreateAsync(userEntity);
 
         return userEntity.AsDto();
     }
 
     public async Task UpdateUser(int id, UpdateUserDto updateUserDto)
     {
-        User user = await dbContext.Users.FindAsync(id)
+        User user = await repository.GetByIdAsync(id)
                     ?? throw new KeyNotFoundException($"User with ID {id} was not found");
 
         if (!string.IsNullOrWhiteSpace(updateUserDto.FullName)) user.FullName = updateUserDto.FullName;
         if (!string.IsNullOrWhiteSpace(updateUserDto.Username)) user.Username = updateUserDto.Username;
         if (!string.IsNullOrWhiteSpace(updateUserDto.Email)) user.Email = updateUserDto.Email;
 
-        await dbContext.SaveChangesAsync();
+        await repository.UpdateAsync(user);
     }
 
     public async Task DeleteUser(int id)
     {
-        User user = await dbContext.Users.FindAsync(id)
+        User user = await repository.GetByIdAsync(id)
                     ?? throw new KeyNotFoundException($"User with ID {id} was not found");
 
-        dbContext.Users.Remove(user);
-        await dbContext.SaveChangesAsync();
+        await repository.DeleteAsync(user);
     }
 
     public async Task AssignProject(AssignProjectDto assignProjectDto)
     {
-        User user = await dbContext.Users
-                                   .Include(u => u.AssignedProjects)
-                                   .FirstOrDefaultAsync(u => u.Id == assignProjectDto.UserId)
+        User user = await repository.GetByIdAsync(assignProjectDto.UserId)
                     ?? throw new KeyNotFoundException($"User with ID {assignProjectDto.UserId} was not found");
 
-        Project project = await dbContext.Projects
-                                         .FirstOrDefaultAsync(p => p.Id == assignProjectDto.ProjectId)
+        Project project = await projectRepository.GetByIdAsync(assignProjectDto.ProjectId)
                           ?? throw new KeyNotFoundException(
                               $"Project with ID {assignProjectDto.ProjectId} was not found");
 
         user.AssignedProjects.Add(project);
 
-        await dbContext.SaveChangesAsync();
-    }
-
-    private IQueryable<User> QueryUsers()
-    {
-        return dbContext.Users
-                        .Include(user => user.AssignedTasks)
-                        .Include(user => user.OwnedProjects)
-                        .Include(user => user.AssignedProjects);
+        await repository.UpdateAsync(user);
     }
 }
