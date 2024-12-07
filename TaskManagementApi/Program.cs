@@ -1,8 +1,15 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using TaskManagementApi.Data;
 using TaskManagementApi.Data.Repositories;
+using TaskManagementApi.Services.LoginHandling;
 using TaskManagementApi.Services.ProjectHandling;
 using TaskManagementApi.Services.TaskHandling;
 using TaskManagementApi.Services.UserHandling;
+using TaskManagementApi.Swagger;
 
 namespace TaskManagementApi;
 
@@ -11,23 +18,8 @@ public class Program
     public static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container.
-
-        builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
-
-        builder.Services.AddScoped<AppDbContext>();
-
-        builder.Services.AddScoped<UserRepository>();
-        builder.Services.AddScoped<ProjectRepository>();
-        builder.Services.AddScoped<TaskRepository>();
         
-        builder.Services.AddScoped<IUserService, UserService>();
-        builder.Services.AddScoped<IProjectService, ProjectService>();
-        builder.Services.AddScoped<ITaskService, TaskService>();
+        AddServices(builder);
 
         WebApplication app = builder.Build();
 
@@ -40,10 +32,64 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
 
         app.Run();
+    }
+
+    private static void AddServices(WebApplicationBuilder builder)
+    {
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
+        builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+        builder.Services.Configure<AppDbContext>(builder.Configuration.GetSection(DbContextConfigurationSectionName));
+        builder.Services.AddScoped<AppDbContext>();
+
+        builder.Services.AddScoped<UserRepository>();
+        builder.Services.AddScoped<ProjectRepository>();
+        builder.Services.AddScoped<TaskRepository>();
+        
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IProjectService, ProjectService>();
+        builder.Services.AddScoped<ITaskService, TaskService>();
+        builder.Services.AddTransient<ILoginService, LoginService>();
+
+        builder.Services
+               .AddAuthentication(x=>
+               {
+                   x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                   x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                   x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+               })
+               .AddJwtBearer(options =>
+               {
+                   options.TokenValidationParameters = new TokenValidationParameters()
+                   {
+                       ValidIssuer = builder.Configuration["JWT:Issuer"],
+                       ValidAudience = builder.Configuration["JWT:ValidAudience"],
+                       IssuerSigningKey = GetJwtSecurityKey(builder.Configuration["JWT:SecurityKey"]),
+                       ValidateIssuer = true,
+                       ValidateAudience = true,
+                       ValidateLifetime = true,
+                       ValidateIssuerSigningKey = true,
+                   };
+               });
+        
+        builder.Services.AddAuthorization();
+    }
+    
+    private static SymmetricSecurityKey GetJwtSecurityKey(string? key)
+    {
+        if (key is null)
+        {
+            throw new InvalidOperationException("Missing JWT Security Key");
+        }
+
+        return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
     }
 }

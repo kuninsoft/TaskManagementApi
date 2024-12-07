@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TaskManagementApi.Models;
 using TaskManagementApi.Models.User;
 using TaskManagementApi.Services.UserHandling;
 
 namespace TaskManagementApi.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController(IUserService userService) : ControllerBase
