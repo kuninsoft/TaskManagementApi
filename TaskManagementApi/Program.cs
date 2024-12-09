@@ -47,7 +47,8 @@ public class Program
         builder.Services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
         builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-        builder.Services.Configure<AppDbContext>(builder.Configuration.GetSection(DbContextConfigurationSectionName));
+        builder.Services.Configure<DatabaseOptions>(
+            builder.Configuration.GetSection(DatabaseOptions.DbConfiguration));
         builder.Services.AddScoped<AppDbContext>();
 
         builder.Services.AddScoped<UserRepository>();

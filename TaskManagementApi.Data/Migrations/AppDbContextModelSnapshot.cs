@@ -29,7 +29,7 @@ namespace TaskManagementApi.Data.Migrations
 
                     b.HasIndex("AssignedUsersId");
 
-                    b.ToTable("ProjectUser");
+                    b.ToTable("ProjectUser", (string)null);
                 });
 
             modelBuilder.Entity("TaskManagementApi.Data.Entities.Project", b =>
@@ -65,7 +65,7 @@ namespace TaskManagementApi.Data.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("TaskManagementApi.Data.Entities.Task", b =>
@@ -114,7 +114,7 @@ namespace TaskManagementApi.Data.Migrations
 
                     b.HasIndex("ReporterUserId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Tasks", (string)null);
                 });
 
             modelBuilder.Entity("TaskManagementApi.Data.Entities.User", b =>
@@ -150,7 +150,7 @@ namespace TaskManagementApi.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ProjectUser", b =>

@@ -1,26 +1,29 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TaskManagementApi.Data.Entities;
 
 namespace TaskManagementApi.Data;
 
 public class AppDbContext : DbContext
 {
+    private readonly DatabaseOptions _options;
+    
+    private readonly string _dbPath;
+    
     public DbSet<User> Users { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Entities.Task> Tasks { get; set; }
 
-    public string DbPath { get; set; }
-
-    public AppDbContext()
+    public AppDbContext(IOptions<DatabaseOptions> options)
     {
+        _options = options.Value;
+        
         string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-        DbPath = Path.Join(path, "api.db"); 
+        _dbPath = Path.Join(path, _options.FileName); 
     }
 
-    // TODO Extract to appsettings.json
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+        => options.UseSqlite(string.Format(_options.ConnectionString, _dbPath));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
