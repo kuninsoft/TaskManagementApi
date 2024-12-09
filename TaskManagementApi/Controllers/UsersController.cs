@@ -39,6 +39,7 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Post([FromBody] CreateUserDto value)
     {
         if (!ModelState.IsValid)

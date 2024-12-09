@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Models.Tasks;
 using TaskManagementApi.Services.TaskHandling;
 
 namespace TaskManagementApi.Controllers;
 
-[ApiController]
+[Authorize]
 [Route("api/[controller]")]
+[ApiController]
 public class TasksController(ITaskService taskService) : ControllerBase
 {
     [HttpGet]
