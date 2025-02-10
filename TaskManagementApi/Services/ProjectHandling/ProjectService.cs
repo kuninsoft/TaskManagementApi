@@ -3,10 +3,11 @@ using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Extensions;
 using TaskManagementApi.Models.Project;
 using Task = System.Threading.Tasks.Task;
+using TimeProvider = TaskManagementApi.Services.TimeProvider;
 
 namespace TaskManagementApi.Services.ProjectHandling;
 
-public class ProjectService(ProjectRepository repository) : IProjectService
+public class ProjectService(IProjectRepository repository) : IProjectService
 {
     public async Task<List<ProjectDto>> GetAllProjects()
     {
@@ -30,7 +31,7 @@ public class ProjectService(ProjectRepository repository) : IProjectService
             Name = createProjectDto.Title,
             Description = createProjectDto.Description,
             OwnerId = createProjectDto.OwnerId,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = TimeProvider.UtcNow,
             DueDate = createProjectDto.DueDate
         };
 

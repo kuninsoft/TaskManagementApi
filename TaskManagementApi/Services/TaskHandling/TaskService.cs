@@ -6,7 +6,7 @@ using TaskEntity = TaskManagementApi.Data.Entities.Task;
 
 namespace TaskManagementApi.Services.TaskHandling;
 
-public class TaskService(TaskRepository repository) : ITaskService
+public class TaskService(ITaskRepository repository) : ITaskService
 {
     public async Task<List<TaskDto>> GetAllTasks()
     {

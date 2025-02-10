@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace TaskManagementApi.Services.UserHandling;
 
-public class UserService(UserRepository repository, ProjectRepository projectRepository) : IUserService
+public class UserService(IUserRepository repository, IProjectRepository projectRepository) : IUserService
 {
     public async Task<List<UserDto>> GetAllUsers()
     {

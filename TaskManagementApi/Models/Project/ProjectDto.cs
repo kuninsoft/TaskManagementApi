@@ -6,17 +6,17 @@ namespace TaskManagementApi.Models.Project;
 
 public class ProjectDto
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
     
-    public string Name { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public string Name { get; init; } = null!;
+    public string Description { get; init; } = null!;
     
-    public DateTime CreatedDate { get; set; }
-    public DateTime DueDate { get; set; }
+    public DateTime CreatedDate { get; init; }
+    public DateTime DueDate { get; init; }
     
-    public ProjectStatus Status { get; set; }
+    public ProjectStatus Status { get; init; }
 
-    public UserSummaryDto? Owner { get; set; }
-    public List<UserSummaryDto> ProjectTeam { get; set; } = [];
-    public List<TaskSummaryDto> Tasks { get; set; } = [];
+    public UserSummaryDto? Owner { get; init; }
+    public List<UserSummaryDto> ProjectTeam { get; init; } = [];
+    public List<TaskSummaryDto> Tasks { get; init; } = [];
 }

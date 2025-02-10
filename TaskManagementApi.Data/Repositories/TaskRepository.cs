@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TaskManagementApi.Data.Repositories;
 
-public class TaskRepository(AppDbContext dbContext) : IRepository<Entities.Task>
+public class TaskRepository(AppDbContext dbContext) : ITaskRepository
 {
     public Task<List<Entities.Task>> GetAllAsync()
     {

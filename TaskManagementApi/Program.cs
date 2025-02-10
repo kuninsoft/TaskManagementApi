@@ -51,9 +51,9 @@ public class Program
             builder.Configuration.GetSection(DatabaseOptions.DbConfiguration));
         builder.Services.AddScoped<AppDbContext>();
 
-        builder.Services.AddScoped<UserRepository>();
-        builder.Services.AddScoped<ProjectRepository>();
-        builder.Services.AddScoped<TaskRepository>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+        builder.Services.AddScoped<ITaskRepository, TaskRepository>();
         
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();

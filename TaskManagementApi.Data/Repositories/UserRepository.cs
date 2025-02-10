@@ -5,7 +5,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace TaskManagementApi.Data.Repositories;
 
-public class UserRepository(AppDbContext dbContext) : IRepository<User>
+public class UserRepository(AppDbContext dbContext) : IUserRepository
 {
     public Task<List<User>> GetAllAsync()
     {

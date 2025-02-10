@@ -11,7 +11,7 @@ using TaskManagementApi.Services.UserHandling;
 
 namespace TaskManagementApi.Services.LoginHandling;
 
-public class LoginService(UserRepository repository) : ILoginService
+public class LoginService(IUserRepository repository) : ILoginService
 {
     public async Task<string> Login(LoginRequestDto loginRequestDto)
     {
