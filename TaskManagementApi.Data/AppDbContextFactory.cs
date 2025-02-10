@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace TaskManagementApi.Data;
 
+// IMPORTANT: This is a utility class needed for migrations to work properly
 public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
