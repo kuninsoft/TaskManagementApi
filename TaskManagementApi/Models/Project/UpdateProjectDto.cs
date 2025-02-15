@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using TaskManagementApi.Data.Entities.Enums;
+using TaskManagementApi.Models.Enums;
 
 namespace TaskManagementApi.Models.Project;
 

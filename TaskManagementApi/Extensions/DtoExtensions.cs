@@ -27,4 +27,16 @@ public static class DtoExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Invalid status passed")
         };
     }
+
+    public static EntityEnums.ProjectStatus ToEntityEnum(this DtoEnums.ProjectStatus status)
+    {
+        return status switch
+        {
+            DtoEnums.ProjectStatus.Active => EntityEnums.ProjectStatus.Active,
+            DtoEnums.ProjectStatus.Completed => EntityEnums.ProjectStatus.Completed,
+            DtoEnums.ProjectStatus.Canceled => EntityEnums.ProjectStatus.Canceled,
+            DtoEnums.ProjectStatus.OnHold => EntityEnums.ProjectStatus.OnHold,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Invalid status passed")
+        };
+    }
 }
