@@ -2,11 +2,12 @@ using TaskManagementApi.Data.Entities;
 using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Extensions;
 using TaskManagementApi.Models.Project;
+using TaskManagementApi.Services.TimeProvider;
 using Task = System.Threading.Tasks.Task;
 
 namespace TaskManagementApi.Services.ProjectHandling;
 
-public class ProjectService(IProjectRepository repository) : IProjectService
+public class ProjectService(IProjectRepository repository, ITimeProvider timeProvider) : IProjectService
 {
     public async Task<List<ProjectDto>> GetAllProjects()
     {
@@ -25,7 +26,7 @@ public class ProjectService(IProjectRepository repository) : IProjectService
 
     public async Task<ProjectDto> CreateProject(CreateProjectDto createProjectDto)
     {
-        if (createProjectDto.DueDate < TimeProvider.Now)
+        if (createProjectDto.DueDate < timeProvider.Now)
         {
             throw new ArgumentException("Due date cannot be in the past");
         }
@@ -35,11 +36,11 @@ public class ProjectService(IProjectRepository repository) : IProjectService
             Name = createProjectDto.Title,
             Description = createProjectDto.Description,
             OwnerId = createProjectDto.OwnerId,
-            CreatedDate = TimeProvider.UtcNow,
+            CreatedDate = timeProvider.UtcNow,
             DueDate = createProjectDto.DueDate
         };
 
-        await repository.CreateAsync(projectEntity);
+        projectEntity = await repository.CreateAsync(projectEntity);
         
         return projectEntity.AsDto();
     }

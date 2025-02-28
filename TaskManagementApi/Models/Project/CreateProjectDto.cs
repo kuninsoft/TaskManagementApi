@@ -5,11 +5,11 @@ namespace TaskManagementApi.Models.Project;
 
 public class CreateProjectDto
 {
-    [Required] [StringLength(255)] public string Title { get; set; } = null!;
+    [Required] [StringLength(255)] [MinLength(1)] public string Title { get; init; } = null!;
 
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 
-    public DateTime DueDate { get; set; } = TimeProvider.Now.AddMonths(1);
+    public DateTime? DueDate { get; init; } 
 
-    [Required] [Range(1, int.MaxValue)] public int OwnerId { get; set; }
+    [Required] [Range(1, int.MaxValue)] public int OwnerId { get; init; }
 }

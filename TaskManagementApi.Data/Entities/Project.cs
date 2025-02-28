@@ -12,7 +12,7 @@ public class Project
     public string Description { get; set; } = string.Empty;
     
     public DateTime CreatedDate { get; set; }
-    public DateTime DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
     
     public ProjectStatus Status { get; set; }
     

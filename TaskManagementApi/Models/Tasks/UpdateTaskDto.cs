@@ -12,4 +12,5 @@ public class UpdateTaskDto
     public TaskPriority? Priority { get; set; }
     public int? ReporterUserId { get; set; }
     public int? AssignedUserId { get; set; }
+    public DateTime? DueDate { get; set; }
 }

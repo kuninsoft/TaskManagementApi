@@ -4,6 +4,7 @@ using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Models.Enums;
 using TaskManagementApi.Models.Project;
 using TaskManagementApi.Services.ProjectHandling;
+using TaskManagementApi.UnitTests.Factories;
 using Task = System.Threading.Tasks.Task;
 using TimeProvider = TaskManagementApi.Services.TimeProvider;
 
@@ -15,45 +16,34 @@ public class TestProjectService
     [Test]
     public async Task GetAllProjects_ProjectsExist_ReturnsCollectionOfProjects()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
-        
-        A.CallTo(() => projectRepository.GetAllAsync()).Returns([new Project(), new Project()]);
+        var factory = new TestProjectServiceFactory();
+        A.CallTo(() => factory.ProjectRepository.GetAllAsync()).Returns([new Project(), new Project()]);
+        ProjectService projectService = factory.Create();
         
         List<ProjectDto> projects = await projectService.GetAllProjects();
         
-        Assert.Multiple(() =>
-        {
-            Assert.That(projects, Is.Not.Null);
-            Assert.That(projects, Is.Not.Empty);
-        });
+        Assert.That(projects, Is.Not.Empty);
     }
 
     [Test]
     public async Task GetAllProjects_NoProjects_ReturnsEmptyCollection()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
-        
-        A.CallTo(() => projectRepository.GetAllAsync()).Returns([]);
+        var factory = new TestProjectServiceFactory();
+        A.CallTo(() => factory.ProjectRepository.GetAllAsync()).Returns([]);
+        ProjectService projectService = factory.Create();
         
         List<ProjectDto> projects = await projectService.GetAllProjects();
         
-        Assert.Multiple(() =>
-        {
-            Assert.That(projects, Is.Not.Null);
-            Assert.That(projects, Is.Empty);
-        });
+        Assert.That(projects, Is.Empty);
     }
     
     [Test]
     public async Task GetProject_ProjectWithIdExists_ReturnsProject()
     {
         // Arrange
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
+        var factory = new TestProjectServiceFactory();
 
-        A.CallTo(() => projectRepository.GetByIdAsync(An<int>.Ignored)).Returns(new Project
+        A.CallTo(() => factory.ProjectRepository.GetByIdAsync(An<int>.Ignored)).Returns(new Project
         {
             Id = 0,
             Name = "A project name",
@@ -62,6 +52,8 @@ public class TestProjectService
             DueDate = new DateTime(1970, 2, 1),
             Status = Data.Entities.Enums.ProjectStatus.Active
         });
+        
+        ProjectService projectService = factory.Create();
         
         // Act
         ProjectDto actualProjectDto = await projectService.GetProject(0);
@@ -90,11 +82,10 @@ public class TestProjectService
     [Test]
     public void GetProject_ProjectWithDoesNotExist_ThrowsKeyNotFoundException()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
-        
+        var factory = new TestProjectServiceFactory();
         Project? valueToReturn = null;
-        A.CallTo(() => projectRepository.GetByIdAsync(An<int>.Ignored)).Returns(valueToReturn);
+        A.CallTo(() => factory.ProjectRepository.GetByIdAsync(An<int>.Ignored)).Returns(valueToReturn);
+        ProjectService projectService = factory.Create();
         
         Assert.ThrowsAsync<KeyNotFoundException>(() => projectService.GetProject(0));
     }
@@ -102,31 +93,19 @@ public class TestProjectService
     [Test]
     public void CreateProject_DueDateBeforeCreatedDate_ThrowsArgumentException()
     {
-        // Arrange
-        var projectCreatedDate = new DateTime(1970, 2, 1);
-        var projectDueDate = new DateTime(1970, 1, 1);
+        var projectDueDate = new DateTime(1969, 1, 1);
         
         var createProjectDto = new CreateProjectDto
         {
-            Title =  "A project title",
+            Title = "A project title",
             Description = "A project description",
             DueDate = projectDueDate,
             OwnerId = 0
         };
         
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
+        ProjectService projectService = new TestProjectServiceFactory().Create();
         
-        TimeProvider.SetCustomNow(projectCreatedDate);
-
-        try
-        {
-            Assert.ThrowsAsync<ArgumentException>(() => projectService.CreateProject(createProjectDto));
-        }
-        finally
-        {
-            TimeProvider.Reset();
-        }
+        Assert.ThrowsAsync<ArgumentException>(() => projectService.CreateProject(createProjectDto));
     }
     
     [Test]
@@ -145,17 +124,24 @@ public class TestProjectService
             DueDate = projectDueDate,
             OwnerId = 0
         };
-        
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
-        
-        TimeProvider.SetCustomNow(projectCreatedDate);
+
+        var factory = new TestProjectServiceFactory();
+
+        A.CallTo(() => factory.ProjectRepository.CreateAsync(A<Project>.Ignored)).Returns(new Project
+        {
+            Id = 0,
+            Name = projectTitle,
+            Description = projectDescription,
+            CreatedDate = projectCreatedDate,
+            DueDate = projectDueDate,
+            Status = Data.Entities.Enums.ProjectStatus.Active
+        });
+       
+        ProjectService projectService = factory.Create();
         
         // Act
         ProjectDto actualProject = await projectService.CreateProject(createProjectDto);
         
-        TimeProvider.Reset();
-
         // Assert
         var expectedProject = new ProjectDto
         {
@@ -180,24 +166,25 @@ public class TestProjectService
     [Test]
     public void UpdateProject_ProjectWithIdDoesNotExist_ThrowsKeyNotFoundException()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
-        var updateProjectDto = new UpdateProjectDto();
-        
+        var factory = new TestProjectServiceFactory();
         Project? valueToReturn = null;
-        A.CallTo(() => projectRepository.GetByIdAsync(An<int>.Ignored)).Returns(valueToReturn);
+        A.CallTo(() => factory.ProjectRepository.GetByIdAsync(An<int>.Ignored)).Returns(valueToReturn);
+        ProjectService projectService = factory.Create();
+        
+        var updateProjectDto = new UpdateProjectDto();
         
         Assert.ThrowsAsync<KeyNotFoundException>(() => projectService.UpdateProject(0, updateProjectDto));
     }
     
-    [Test]
-    public void UpdateProject_NameSpecifiedButAnEmptyString_ThrowsArgumentException()
+    [TestCase("")]
+    [TestCase(" ")]
+    [TestCase("\n")]
+    public void UpdateProject_NameSpecifiedButAnEmptyString_ThrowsArgumentException(string name)
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
+        ProjectService projectService = new TestProjectServiceFactory().Create();
         var updateProjectDto = new UpdateProjectDto
         {
-            Name = string.Empty
+            Name = name
         };
         
         Assert.ThrowsAsync<ArgumentException>(() => projectService.UpdateProject(0, updateProjectDto));
@@ -206,10 +193,9 @@ public class TestProjectService
     [Test]
     public void UpdateProject_DueDateBeforeCreatedDate_ThrowsArgumentException()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
+        var factory = new TestProjectServiceFactory();
         
-        A.CallTo(() => projectRepository.GetByIdAsync(An<int>.Ignored)).Returns(new Project
+        A.CallTo(() => factory.ProjectRepository.GetByIdAsync(An<int>.Ignored)).Returns(new Project
         {
             CreatedDate = new DateTime(1970, 1, 1)
         });
@@ -219,26 +205,28 @@ public class TestProjectService
             DueDate = DateTime.MinValue
         };
         
+        ProjectService projectService = factory.Create();
+        
         Assert.ThrowsAsync<ArgumentException>(() => projectService.UpdateProject(0, updateProjectDto));
     }
     
     [Test]
     public async Task UpdateProject_EmptyDto_CallsUpdateOnRepository()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
+        var factory = new TestProjectServiceFactory();
+        ProjectService projectService = factory.Create();
         var updateProjectDto = new UpdateProjectDto();
         
         await projectService.UpdateProject(0, updateProjectDto);
         
-        A.CallTo(() => projectRepository.UpdateAsync(A<Project>.Ignored)).MustHaveHappened();
+        A.CallTo(() => factory.ProjectRepository.UpdateAsync(A<Project>.Ignored)).MustHaveHappened();
     }
     
     [Test]
     public async Task UpdateProject_ValidNonEmptyDto_CallsUpdateOnRepository()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
+        var factory = new TestProjectServiceFactory();
+        ProjectService projectService = factory.Create();
         var updateProjectDto = new UpdateProjectDto
         {
             Name = "A project name",
@@ -249,28 +237,27 @@ public class TestProjectService
         
         await projectService.UpdateProject(0, updateProjectDto);
         
-        A.CallTo(() => projectRepository.UpdateAsync(A<Project>.Ignored)).MustHaveHappened();
+        A.CallTo(() => factory.ProjectRepository.UpdateAsync(A<Project>.Ignored)).MustHaveHappened();
     }
     
     [Test]
     public async Task DeleteProject_ProjectWithIdExists_CallsRepository()
     {
-        var projectRepositoryMock = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepositoryMock);
+        var factory = new TestProjectServiceFactory();
+        ProjectService projectService = factory.Create();
 
         await projectService.DeleteProject(0);
 
-        A.CallTo(() => projectRepositoryMock.DeleteAsync(A<Project>.Ignored)).MustHaveHappened();
+        A.CallTo(() => factory.ProjectRepository.DeleteAsync(A<Project>.Ignored)).MustHaveHappened();
     }
     
     [Test]
     public void DeleteProject_ProjectWithIdDoesNotExist_ThrowsKeyNotFoundException()
     {
-        var projectRepository = A.Fake<IProjectRepository>();
-        var projectService = new ProjectService(projectRepository);
-
+        var factory = new TestProjectServiceFactory();
         Project? valueToReturn = null;
-        A.CallTo(() => projectRepository.GetByIdAsync(An<int>.Ignored)).Returns(valueToReturn);
+        A.CallTo(() => factory.ProjectRepository.GetByIdAsync(An<int>.Ignored)).Returns(valueToReturn);
+        ProjectService projectService = factory.Create();
 
         Assert.ThrowsAsync<KeyNotFoundException>(() => projectService.DeleteProject(0));
     }

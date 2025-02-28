@@ -8,8 +8,10 @@ using TaskManagementApi.Data.Repositories;
 using TaskManagementApi.Services.LoginHandling;
 using TaskManagementApi.Services.ProjectHandling;
 using TaskManagementApi.Services.TaskHandling;
+using TaskManagementApi.Services.TimeProvider;
 using TaskManagementApi.Services.UserHandling;
 using TaskManagementApi.Swagger;
+using TimeProvider = TaskManagementApi.Services.TimeProvider.TimeProvider;
 
 namespace TaskManagementApi;
 
@@ -54,6 +56,8 @@ public class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
         builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
+        builder.Services.AddSingleton<ITimeProvider, TimeProvider>();
         
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();

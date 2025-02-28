@@ -12,7 +12,7 @@ public class ProjectDto
     public string Description { get; init; } = null!;
     
     public DateTime CreatedDate { get; init; }
-    public DateTime DueDate { get; init; }
+    public DateTime? DueDate { get; init; }
     
     public ProjectStatus Status { get; init; }
 
